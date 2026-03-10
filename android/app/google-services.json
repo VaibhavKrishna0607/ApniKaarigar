@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "862580396720",
+    "project_id": "apnakaarigar-5c619",
+    "storage_bucket": "apnakaarigar-5c619.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862580396720:android:efe26b54083525e1e0e175",
+        "android_client_info": {
+          "package_name": "com.apnikaarigar.sbi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlsK7DRSdqAKoanCMhGxmhylroYLlzjkk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

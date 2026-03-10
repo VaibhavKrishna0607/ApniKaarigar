@@ -1,0 +1,20 @@
+[
+  {
+    "origin": [
+      "http://localhost",
+      "http://localhost:*",
+      "https://apnakaarigar-5c619.web.app",
+      "https://apnakaarigar-5c619.firebaseapp.com"
+    ],
+    "method": ["GET", "PUT", "POST", "DELETE", "HEAD", "OPTIONS"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "Content-Length",
+      "User-Agent",
+      "x-goog-resumable",
+      "x-goog-meta-firebaseStorageDownloadTokens"
+    ]
+  }
+]
