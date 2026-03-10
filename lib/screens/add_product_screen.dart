@@ -631,12 +631,29 @@ class _AddProductScreenState extends State<AddProductScreen> {
         List<String> imageUrls = [];
         if (_selectedImages.isNotEmpty) {
           debugPrint('Uploading ${_selectedImages.length} images...');
-          imageUrls = await _storageService.uploadProductImages(
-            imageFiles: _selectedImages,
-            artisanId: _dataProvider.artisanId,
-            productId: tempProductId,
-          );
-          debugPrint('Images uploaded: ${imageUrls.length} URLs received');
+          try {
+            imageUrls = await _storageService.uploadProductImages(
+              imageFiles: _selectedImages,
+              artisanId: _dataProvider.artisanId,
+              productId: tempProductId,
+            );
+            debugPrint('Images uploaded: ${imageUrls.length} URLs received');
+          } catch (e) {
+            debugPrint('Error uploading images: $e');
+            // Close loading dialog
+            if (mounted) Navigator.pop(context);
+            
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error uploading images: $e'),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 5),
+                ),
+              );
+            }
+            return; // Stop execution if image upload fails
+          }
         } else {
           debugPrint('No images to upload');
         }

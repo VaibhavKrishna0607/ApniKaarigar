@@ -122,55 +122,51 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppTheme.primaryColor,
-              AppTheme.primaryDark,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              // Logo and Title
-              _buildHeader(),
-              const SizedBox(height: 40),
-              // Auth Card
-              Expanded(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
+      backgroundColor: AppTheme.backgroundColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 32),
+            // Logo and Title
+            _buildHeader(),
+            const SizedBox(height: 32),
+            // Auth Card
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.cardColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
                     ),
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      // Tab Bar
-                      _buildTabBar(),
-                      // Tab Content
-                      Expanded(
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            _buildLoginForm(),
-                            _buildSignupForm(),
-                          ],
-                        ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 24),
+                    // Tab Bar
+                    _buildTabBar(),
+                    // Tab Content
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          _buildLoginForm(),
+                          _buildSignupForm(),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -180,32 +176,42 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(20),
+          width: 80,
+          height: 80,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
-            shape: BoxShape.circle,
+            color: AppTheme.primaryColor,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryColor.withOpacity(0.3),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: const Icon(
-            Icons.storefront,
-            size: 60,
+            Icons.storefront_rounded,
+            size: 40,
             color: Colors.white,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         const Text(
           'ApnaKaarigar',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppTheme.textPrimary,
+            letterSpacing: -0.5,
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          'Empowering Local Artisans',
+          'Handmade by India\'s finest artisans',
           style: TextStyle(
-            fontSize: 16,
-            color: Colors.white.withValues(alpha: 0.9),
+            fontSize: 14,
+            color: AppTheme.textSecondary,
+            fontWeight: FontWeight.w400,
           ),
         ),
       ],
@@ -215,20 +221,35 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   Widget _buildTabBar() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(30),
+        color: AppTheme.mutedClay.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
           color: AppTheme.primaryColor,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.grey[600],
-        labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        unselectedLabelColor: AppTheme.textSecondary,
+        labelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 15,
+        ),
         tabs: const [
           Tab(text: 'Login'),
           Tab(text: 'Sign Up'),
@@ -291,7 +312,19 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: _handleForgotPassword,
-                child: const Text('Forgot Password?'),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: const Size(0, 0),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'Forgot Password?',
+                  style: TextStyle(
+                    color: AppTheme.accentColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -438,44 +471,50 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   }) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(icon, color: AppTheme.primaryColor),
+      prefixIcon: Icon(icon, color: AppTheme.primaryColor, size: 22),
       suffixIcon: suffixIcon,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: AppTheme.mutedClay, width: 1),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: AppTheme.mutedClay, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
       ),
       filled: true,
-      fillColor: Colors.grey[50],
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      labelStyle: const TextStyle(
+        color: AppTheme.textSecondary,
+        fontSize: 14,
+      ),
     );
   }
 
   Widget _buildSubmitButton(String text, VoidCallback onPressed) {
     return SizedBox(
-      height: 54,
+      height: 56,
       child: ElevatedButton(
         onPressed: _isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.primaryColor,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           elevation: 2,
+          shadowColor: AppTheme.primaryColor.withOpacity(0.3),
         ),
         child: _isLoading
             ? const SizedBox(
-                width: 24,
-                height: 24,
+                width: 22,
+                height: 22,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: 2.5,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
@@ -483,7 +522,8 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                 text,
                 style: const TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
                 ),
               ),
       ),

@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Primary colors - Earthy tones for artisan feel
-  static const Color primaryColor = Color(0xFF8B4513); // Saddle Brown
-  static const Color primaryLight = Color(0xFFD2691E); // Chocolate
-  static const Color primaryDark = Color(0xFF5D2E0C);
+  // ApnaKaarigar Brand Colors - Warm, Earthy, Premium
+  static const Color primaryColor = Color(0xFF6F8E64); // Dark Sage Green
+  static const Color primaryLight = Color(0xFF8BA67E); // Lighter Sage
+  static const Color primaryDark = Color(0xFF5A7350); // Darker Sage
   
   // Accent colors
-  static const Color accentColor = Color(0xFFDAA520); // Goldenrod
-  static const Color accentLight = Color(0xFFFFD700); // Gold
+  static const Color accentColor = Color(0xFFC6A75E); // Soft Gold
+  static const Color accentLight = Color(0xFFD4B876); // Lighter Gold
   
   // Background colors
-  static const Color backgroundColor = Color(0xFFFAF8F5);
-  static const Color surfaceColor = Color(0xFFFFFFFF);
-  static const Color cardColor = Color(0xFFFFFBF5);
+  static const Color backgroundColor = Color(0xFFF4F1EA); // Warm Cream
+  static const Color surfaceColor = Color(0xFFFFFFFF); // Pure White
+  static const Color cardColor = Color(0xFFFFFFFF); // Card White
+  static const Color mutedClay = Color(0xFFD8CFC4); // Muted Clay
   
   // Text colors
-  static const Color textPrimary = Color(0xFF2C1810);
-  static const Color textSecondary = Color(0xFF6B5B4F);
-  static const Color textLight = Color(0xFF9E8E82);
+  static const Color textPrimary = Color(0xFF2E2E2E); // Dark Gray
+  static const Color textSecondary = Color(0xFF6B6B6B); // Medium Gray
+  static const Color textLight = Color(0xFF9E9E9E); // Light Gray
   
   // Status colors
   static const Color successColor = Color(0xFF4CAF50);
@@ -105,25 +106,25 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE0D5C9)),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: mutedClay, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE0D5C9)),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: mutedClay, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: errorColor),
         ),
-        labelStyle: const TextStyle(color: textSecondary),
-        hintStyle: const TextStyle(color: textLight),
+        labelStyle: const TextStyle(color: textSecondary, fontSize: 14),
+        hintStyle: const TextStyle(color: textLight, fontSize: 14),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,

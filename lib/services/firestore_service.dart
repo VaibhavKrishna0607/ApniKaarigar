@@ -286,6 +286,17 @@ class FirestoreService {
     required double totalPrice,
     String? specialInstructions,
   }) async {
+    // Get current product to check stock
+    final product = await getProduct(productId);
+    if (product == null) {
+      throw Exception('Product not found');
+    }
+
+    // Check if enough stock is available
+    if (product.stockQuantity < quantity) {
+      throw Exception('Insufficient stock. Only ${product.stockQuantity} items available.');
+    }
+
     final order = app_models.Order(
       id: '', // Will be set by Firestore
       customerId: customerId,
@@ -308,6 +319,12 @@ class FirestoreService {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
+
+    // Update product stock - decrement by quantity ordered
+    final newStock = product.stockQuantity - quantity;
+    await updateProductStock(productId, newStock);
+
+    debugPrint('Order created and stock updated: $productId, new stock: $newStock');
 
     return docRef.id;
   }

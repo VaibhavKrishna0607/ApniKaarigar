@@ -228,7 +228,7 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                     const Icon(Icons.person_outline, size: 18, color: AppTheme.textSecondary),
                     const SizedBox(width: 8),
                     Text(
-                      order.buyerName,
+                      order.customerName,
                       style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ],
@@ -241,7 +241,7 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        order.buyerAddress,
+                        order.customerAddress,
                         style: const TextStyle(
                           color: AppTheme.textSecondary,
                           fontSize: 13,
@@ -256,7 +256,7 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                     const Icon(Icons.access_time, size: 18, color: AppTheme.textSecondary),
                     const SizedBox(width: 8),
                     Text(
-                      _formatDate(order.orderedAt),
+                      _formatDate(order.createdAt),
                       style: const TextStyle(
                         color: AppTheme.textSecondary,
                         fontSize: 13,
@@ -264,7 +264,7 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                     ),
                   ],
                 ),
-                if (order.notes != null) ...[
+                if (order.specialInstructions != null) ...[
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -278,7 +278,7 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            order.notes!,
+                            order.specialInstructions!,
                             style: const TextStyle(
                               fontSize: 13,
                               fontStyle: FontStyle.italic,
@@ -432,7 +432,7 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                   child: const Icon(Icons.phone, color: AppTheme.successColor),
                 ),
                 title: const Text('Call'),
-                subtitle: Text(order.buyerPhone),
+                subtitle: Text(order.customerPhone),
                 onTap: () => Navigator.pop(context),
               ),
               ListTile(
@@ -445,7 +445,7 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                   child: const Icon(Icons.chat, color: Colors.green),
                 ),
                 title: const Text('WhatsApp'),
-                subtitle: Text(order.buyerPhone),
+                subtitle: Text(order.customerPhone),
                 onTap: () => Navigator.pop(context),
               ),
               ListTile(
@@ -458,7 +458,7 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                   child: const Icon(Icons.message, color: AppTheme.infoColor),
                 ),
                 title: const Text('SMS'),
-                subtitle: Text(order.buyerPhone),
+                subtitle: Text(order.customerPhone),
                 onTap: () => Navigator.pop(context),
               ),
               const SizedBox(height: 8),
