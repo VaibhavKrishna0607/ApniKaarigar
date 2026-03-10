@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
+import '../models/product.dart';
+import '../services/firestore_service.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -12,12 +15,15 @@ class _AddProductPageState extends State<AddProductPage> {
   int _currentStep = 0;
   String? _selectedCategory;
   final List<String> _uploadedImages = [];
+  bool _isLoading = false;
   
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
   final _stockController = TextEditingController();
   final _descriptionController = TextEditingController();
+  
+  final _firestoreService = FirestoreService();
 
   final List<String> _categories = [
     'Woodwork',
@@ -649,7 +655,7 @@ class _AddProductPageState extends State<AddProductPage> {
         Expanded(
           flex: _currentStep == 0 ? 1 : 1,
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: _isLoading ? null : () async {
               if (_currentStep < 2) {
                 if (_currentStep == 0 && !_formKey.currentState!.validate()) {
                   return;
@@ -658,13 +664,7 @@ class _AddProductPageState extends State<AddProductPage> {
               } else {
                 // Save product
                 if (_formKey.currentState!.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Product added successfully!'),
-                      backgroundColor: AppTheme.successColor,
-                    ),
-                  );
-                  Navigator.pop(context);
+                  await _saveProduct();
                 }
               }
             },
@@ -677,16 +677,88 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
               elevation: 2,
             ),
-            child: Text(
-              _currentStep < 2 ? 'Continue' : 'Save Product',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: _isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Text(
+                    _currentStep < 2 ? 'Continue' : 'Save Product',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
           ),
         ),
       ],
     );
+  }
+  
+  Future<void> _saveProduct() async {
+    setState(() => _isLoading = true);
+    
+    try {
+      // Get current user
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('User not logged in');
+      }
+      
+      // Create product object
+      final product = Product(
+        id: '', // Will be set by Firestore
+        name: _nameController.text.trim(),
+        description: _descriptionController.text.trim(),
+        price: double.parse(_priceController.text.trim()),
+        category: _selectedCategory!,
+        stockQuantity: int.parse(_stockController.text.trim()),
+        imageUrls: _uploadedImages.isNotEmpty ? _uploadedImages : [''], // Placeholder
+        artisanId: user.uid,
+        artisanName: user.displayName ?? 'Artisan',
+        tags: [_selectedCategory!.toLowerCase()],
+        isAvailable: true,
+        createdAt: DateTime.now(),
+        rating: 0.0,
+        reviewCount: 0,
+      );
+      
+      // Save to Firestore
+      await _firestoreService.createProduct(product, user.uid);
+      
+      if (!mounted) return;
+      
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Product added successfully!'),
+          backgroundColor: AppTheme.successColor,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      
+      // Navigate back
+      Navigator.pop(context);
+      
+    } catch (e) {
+      if (!mounted) return;
+      
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: AppTheme.errorColor,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 }
