@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../services/user_data_provider.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
+import 'activity_screen.dart';
+import 'edit_profile_screen.dart';
+import 'orders_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -147,6 +150,40 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
 
+          // Quick actions strip
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildQuickAction(
+                      icon: Icons.bar_chart_rounded,
+                      label: 'My Activity',
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityScreen())),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildQuickAction(
+                      icon: Icons.receipt_long_outlined,
+                      label: 'Orders',
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrdersScreen())),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildQuickAction(
+                      icon: Icons.edit_outlined,
+                      label: 'Edit Profile',
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen())),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           // Shop info section
           SliverToBoxAdapter(
             child: Padding(
@@ -261,7 +298,10 @@ class ProfileScreen extends StatelessWidget {
                         _buildMenuItem(
                           icon: Icons.store,
                           title: 'Edit Shop Profile',
-                          onTap: () {},
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                          ),
                         ),
                         _buildDivider(),
                         _buildMenuItem(
@@ -291,7 +331,10 @@ class ProfileScreen extends StatelessWidget {
                         _buildMenuItem(
                           icon: Icons.analytics,
                           title: 'Analytics & Insights',
-                          onTap: () {},
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ActivityScreen()),
+                          ),
                         ),
                         _buildDivider(),
                         _buildMenuItem(
@@ -346,6 +389,38 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQuickAction({required IconData icon, required String label, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.07),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppTheme.primaryColor, size: 24),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

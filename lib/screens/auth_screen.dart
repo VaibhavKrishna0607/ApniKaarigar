@@ -122,144 +122,131 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppTheme.primaryColor,
-              AppTheme.primaryDark,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              // Logo and Title
-              _buildHeader(),
-              const SizedBox(height: 40),
-              // Auth Card
-              Expanded(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      // Tab Bar
-                      _buildTabBar(),
-                      // Tab Content
-                      Expanded(
-                        child: TabBarView(
-                          controller: _tabController,
+      backgroundColor: AppTheme.backgroundColor,
+      body: Column(
+        children: [
+          // Purple gradient header with logo + tab switcher
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppTheme.primaryColor, AppTheme.primaryDark],
+              ),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                child: Column(
+                  children: [
+                    // Logo row
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(Icons.storefront, color: Colors.white, size: 28),
+                        ),
+                        const SizedBox(width: 14),
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildLoginForm(),
-                            _buildSignupForm(),
+                            Text(
+                              'ApnaKaarigar',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            Text(
+                              'Artisan Marketplace',
+                              style: TextStyle(color: Colors.white70, fontSize: 13),
+                            ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
+                    // Tab switcher
+                    _buildTabBar(),
+                    const SizedBox(height: 4),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+          // Form content
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [_buildLoginForm(), _buildSignupForm()],
+            ),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.storefront,
-            size: 60,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'ApnaKaarigar',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Empowering Local Artisans',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.white.withValues(alpha: 0.9),
-          ),
-        ),
-      ],
     );
   }
 
   Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(30),
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          color: AppTheme.primaryColor,
-          borderRadius: BorderRadius.circular(30),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.grey[600],
-        labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-        tabs: const [
-          Tab(text: 'Login'),
-          Tab(text: 'Sign Up'),
-        ],
+        labelColor: AppTheme.primaryColor,
+        unselectedLabelColor: Colors.white,
+        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+        dividerColor: Colors.transparent,
+        padding: EdgeInsets.zero,
+        tabs: const [Tab(text: 'Login'), Tab(text: 'Sign Up')],
       ),
     );
   }
 
   Widget _buildLoginForm() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       child: Form(
         key: _loginFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 20),
+            const Text(
+              'Welcome back!',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Sign in to manage your artisan shop',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
+            const SizedBox(height: 28),
             TextFormField(
               controller: _loginEmailController,
               keyboardType: TextInputType.emailAddress,
-              decoration: _inputDecoration(
-                label: 'Email',
-                icon: Icons.email_outlined,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                prefixIcon: Icon(Icons.email_outlined, color: AppTheme.primaryColor),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                if (!value.contains('@')) {
-                  return 'Please enter a valid email';
-                }
+                if (value == null || value.isEmpty) return 'Please enter your email';
+                if (!value.contains('@')) return 'Please enter a valid email';
                 return null;
               },
             ),
@@ -267,22 +254,19 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             TextFormField(
               controller: _loginPasswordController,
               obscureText: _obscureLoginPassword,
-              decoration: _inputDecoration(
-                label: 'Password',
-                icon: Icons.lock_outline,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.primaryColor),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscureLoginPassword ? Icons.visibility_off : Icons.visibility,
+                    _obscureLoginPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    color: AppTheme.textLight,
                   ),
-                  onPressed: () {
-                    setState(() => _obscureLoginPassword = !_obscureLoginPassword);
-                  },
+                  onPressed: () => setState(() => _obscureLoginPassword = !_obscureLoginPassword),
                 ),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
-                }
+                if (value == null || value.isEmpty) return 'Please enter your password';
                 return null;
               },
             ),
@@ -294,8 +278,19 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                 child: const Text('Forgot Password?'),
               ),
             ),
-            const SizedBox(height: 24),
-            _buildSubmitButton('Login', _handleLogin),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 54,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _handleLogin,
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 22, height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Text('Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ),
           ],
         ),
       ),
@@ -304,42 +299,42 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
 
   Widget _buildSignupForm() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       child: Form(
         key: _signupFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 20),
+            const Text(
+              'Create Account',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Join thousands of artisans selling on ApnaKaarigar',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
+            const SizedBox(height: 28),
             TextFormField(
               controller: _signupNameController,
               textCapitalization: TextCapitalization.words,
-              decoration: _inputDecoration(
-                label: 'Full Name',
-                icon: Icons.person_outline,
+              decoration: const InputDecoration(
+                labelText: 'Full Name',
+                prefixIcon: Icon(Icons.person_outline, color: AppTheme.primaryColor),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your name';
-                }
-                return null;
-              },
+              validator: (v) => (v == null || v.isEmpty) ? 'Please enter your name' : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _signupEmailController,
               keyboardType: TextInputType.emailAddress,
-              decoration: _inputDecoration(
-                label: 'Email',
-                icon: Icons.email_outlined,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                prefixIcon: Icon(Icons.email_outlined, color: AppTheme.primaryColor),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                if (!value.contains('@')) {
-                  return 'Please enter a valid email';
-                }
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'Please enter your email';
+                if (!v.contains('@')) return 'Please enter a valid email';
                 return null;
               },
             ),
@@ -347,55 +342,40 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             TextFormField(
               controller: _signupPhoneController,
               keyboardType: TextInputType.phone,
-              decoration: _inputDecoration(
-                label: 'Phone Number',
-                icon: Icons.phone_outlined,
+              decoration: const InputDecoration(
+                labelText: 'Phone Number',
+                prefixIcon: Icon(Icons.phone_outlined, color: AppTheme.primaryColor),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your phone number';
-                }
-                return null;
-              },
+              validator: (v) => (v == null || v.isEmpty) ? 'Please enter your phone number' : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _signupShopNameController,
               textCapitalization: TextCapitalization.words,
-              decoration: _inputDecoration(
-                label: 'Shop Name',
-                icon: Icons.storefront_outlined,
+              decoration: const InputDecoration(
+                labelText: 'Shop Name',
+                prefixIcon: Icon(Icons.storefront_outlined, color: AppTheme.primaryColor),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your shop name';
-                }
-                return null;
-              },
+              validator: (v) => (v == null || v.isEmpty) ? 'Please enter your shop name' : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _signupPasswordController,
               obscureText: _obscureSignupPassword,
-              decoration: _inputDecoration(
-                label: 'Password',
-                icon: Icons.lock_outline,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.primaryColor),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscureSignupPassword ? Icons.visibility_off : Icons.visibility,
+                    _obscureSignupPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    color: AppTheme.textLight,
                   ),
-                  onPressed: () {
-                    setState(() => _obscureSignupPassword = !_obscureSignupPassword);
-                  },
+                  onPressed: () => setState(() => _obscureSignupPassword = !_obscureSignupPassword),
                 ),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a password';
-                }
-                if (value.length < 6) {
-                  return 'Password must be at least 6 characters';
-                }
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'Please enter a password';
+                if (v.length < 6) return 'Password must be at least 6 characters';
                 return null;
               },
             ),
@@ -403,75 +383,35 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             TextFormField(
               controller: _signupConfirmPasswordController,
               obscureText: _obscureConfirmPassword,
-              decoration: _inputDecoration(
-                label: 'Confirm Password',
-                icon: Icons.lock_outline,
+              decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.primaryColor),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                    _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    color: AppTheme.textLight,
                   ),
-                  onPressed: () {
-                    setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
-                  },
+                  onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                 ),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please confirm your password';
-                }
-                return null;
-              },
+              validator: (v) => (v == null || v.isEmpty) ? 'Please confirm your password' : null,
             ),
-            const SizedBox(height: 24),
-            _buildSubmitButton('Create Account', _handleSignup),
+            const SizedBox(height: 28),
+            SizedBox(
+              height: 54,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _handleSignup,
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 22, height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Text('Create Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+            ),
             const SizedBox(height: 40),
           ],
         ),
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration({
-    required String label,
-    required IconData icon,
-    Widget? suffixIcon,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon, color: AppTheme.primaryColor),
-      suffixIcon: suffixIcon,
-    );
-  }
-
-  Widget _buildSubmitButton(String text, VoidCallback onPressed) {
-    return SizedBox(
-      height: 54,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primaryColor,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 2,
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : Text(
-                text,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
       ),
     );
   }

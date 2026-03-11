@@ -102,21 +102,16 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           children: [
-            // Product Summary
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.backgroundColor),
-              ),
+            // Product card with integrated qty stepper
+            _buildSectionCard(
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                     child: SizedBox(
-                      width: 80,
-                      height: 80,
+                      width: 90,
+                      height: 90,
                       child: widget.product.images.isNotEmpty
                           ? Image.network(
                               widget.product.images.first,
@@ -132,114 +127,75 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
                             ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           widget.product.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
+                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           'By ${widget.artisan?.name ?? 'Artisan'}',
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                          ),
+                          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '₹${widget.product.price.toStringAsFixed(0)} each',
+                          '₹${widget.product.price.toStringAsFixed(0)}',
                           style: const TextStyle(
                             color: AppTheme.primaryColor,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 17,
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Quantity Selection
-            const Text(
-              'Quantity',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.backgroundColor),
-              ),
-              child: Row(
-                children: [
-                  const Text(
-                    'Quantity:',
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
-                    icon: const Icon(Icons.remove),
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppTheme.backgroundColor,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    _quantity.toString(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  IconButton(
-                    onPressed: _quantity < widget.product.stockQuantity
-                        ? () => setState(() => _quantity++)
-                        : null,
-                    icon: const Icon(Icons.add),
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppTheme.backgroundColor,
-                    ),
+                  // Qty stepper
+                  Column(
+                    children: [
+                      IconButton(
+                        onPressed: _quantity < widget.product.stockQuantity
+                            ? () => setState(() => _quantity++)
+                            : null,
+                        icon: const Icon(Icons.add, size: 18),
+                        style: IconButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(32, 32),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Text(
+                          '$_quantity',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
+                        icon: const Icon(Icons.remove, size: 18),
+                        style: IconButton.styleFrom(
+                          backgroundColor: AppTheme.backgroundColor,
+                          minimumSize: const Size(32, 32),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Available: ${widget.product.stockQuantity} items',
-              style: const TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 12,
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Customer Information
-            const Text(
-              'Delivery Information',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 16),
+
+            // Delivery Details
+            _buildSectionHeader('Delivery Details'),
+            const SizedBox(height: 8),
 
             // Name
             TextFormField(
@@ -306,68 +262,103 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
               ),
               maxLines: 2,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-            // Order Summary
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // Shipping Method
+            _buildSectionHeader('Shipping Method'),
+            const SizedBox(height: 8),
+            _buildSectionCard(
+              child: Row(
                 children: [
-                  const Text(
-                    'Order Summary',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    width: 44, height: 44,
+                    decoration: BoxDecoration(
+                      color: AppTheme.successColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.local_shipping_outlined, color: AppTheme.successColor),
+                  ),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Standard Delivery', style: TextStyle(fontWeight: FontWeight.w600)),
+                        SizedBox(height: 2),
+                        Text('5–7 business days', style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('${widget.product.name} × $_quantity'),
-                      Text('₹${(widget.product.price * _quantity).toStringAsFixed(0)}'),
-                    ],
-                  ),
-                  const Divider(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Total Amount',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '₹${_totalPrice.toStringAsFixed(0)}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryColor,
-                        ),
-                      ),
-                    ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppTheme.successColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text('FREE', style: TextStyle(color: AppTheme.successColor, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
 
-            // Coupon Code
-            const Text(
-              'Coupon Code',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+            // Payment Method
+            _buildSectionHeader('Payment Method'),
+            const SizedBox(height: 8),
+            _buildSectionCard(
+              child: Row(
+                children: [
+                  Container(
+                    width: 44, height: 44,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.payments_outlined, color: AppTheme.primaryColor),
+                  ),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Cash on Delivery', style: TextStyle(fontWeight: FontWeight.w600)),
+                        SizedBox(height: 2),
+                        Text('Pay when your order arrives', style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text('COD', style: TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold)),
+                  ),
+                ],
               ),
             ),
+            const SizedBox(height: 16),
+
+            // Order Summary
+            _buildSectionHeader('Order Summary'),
+            const SizedBox(height: 8),
+            _buildSectionCard(
+              child: Column(
+                children: [
+                  _buildSummaryRow('${widget.product.name} × $_quantity', '₹${(widget.product.price * _quantity).toStringAsFixed(0)}'),
+                  const SizedBox(height: 10),
+                  _buildSummaryRow('Standard Delivery', 'Free'),
+                  const Divider(height: 24),
+                  _buildSummaryRow('Total Amount', '₹${_totalPrice.toStringAsFixed(0)}', bold: true),
+                  const SizedBox(height: 4),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Coupon Code
+            _buildSectionHeader('Coupon Code'),
             const SizedBox(height: 8),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -443,34 +434,48 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
               ),
             const SizedBox(height: 24),
 
-            // Payment Note
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.accentColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.accentColor.withValues(alpha: 0.3)),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.info, color: AppTheme.accentColor),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Payment will be collected on delivery (Cash on Delivery)',
-                      style: TextStyle(
-                        color: AppTheme.accentColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildSummaryRow(String label, String value, {bool bold = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(color: bold ? AppTheme.textPrimary : AppTheme.textSecondary, fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
+        Text(value, style: TextStyle(fontWeight: bold ? FontWeight.bold : FontWeight.w500, color: bold ? AppTheme.primaryColor : AppTheme.textPrimary, fontSize: bold ? 17 : 14)),
+      ],
     );
   }
 

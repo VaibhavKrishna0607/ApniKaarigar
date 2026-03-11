@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/order.dart';
 import '../services/user_data_provider.dart';
 import '../theme/app_theme.dart';
+import 'order_tracking_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -296,11 +297,21 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
           ),
 
           // Action buttons
-          if (order.status != OrderStatus.delivered && order.status != OrderStatus.cancelled)
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Row(
-                children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Row(
+              children: [
+                // Track button (always shown)
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => OrderTrackingScreen(order: order)),
+                  ),
+                  icon: const Icon(Icons.map_outlined, size: 18),
+                  label: const Text('Track'),
+                ),
+                const SizedBox(width: 8),
+                if (order.status != OrderStatus.delivered && order.status != OrderStatus.cancelled) ...[
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _showContactOptions(order),
@@ -308,7 +319,7 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                       label: const Text('Contact'),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () => _updateOrderStatus(order),
@@ -317,8 +328,9 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
                     ),
                   ),
                 ],
-              ),
+              ],
             ),
+          ),
         ],
       ),
     );

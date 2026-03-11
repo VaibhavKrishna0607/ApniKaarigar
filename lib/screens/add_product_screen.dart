@@ -46,7 +46,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             onPressed: _saveProduct,
             child: const Text(
               'Save',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style: TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.w700),
             ),
           ),
         ],

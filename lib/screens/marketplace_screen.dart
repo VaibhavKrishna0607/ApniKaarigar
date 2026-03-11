@@ -50,120 +50,223 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     final selectedCategory = _marketplaceService.selectedCategory;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Marketplace'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_outlined),
-            onPressed: _loadProducts,
-            tooltip: 'Refresh',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) => _marketplaceService.searchProducts(value),
-              decoration: InputDecoration(
-                hintText: 'Search products...',
-                prefixIcon: const Icon(Icons.search, color: AppTheme.textLight),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, color: AppTheme.textLight),
-                        onPressed: () {
-                          _searchController.clear();
-                          _marketplaceService.searchProducts('');
-                        },
-                      )
-                    : null,
+      backgroundColor: AppTheme.backgroundColor,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header: "Shop" title + refresh
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 8, 0),
+              child: Row(
+                children: [
+                  const Text(
+                    'Shop',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.refresh_outlined, color: AppTheme.textSecondary),
+                    onPressed: _loadProducts,
+                    tooltip: 'Refresh',
+                  ),
+                ],
               ),
             ),
-          ),
 
-          // Category Chips
-          SizedBox(
-            height: 45,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                final isSelected = category == selectedCategory;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: FilterChip(
-                    label: Text(category),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      _marketplaceService.filterByCategory(category);
-                    },
-                    selectedColor: AppTheme.primaryLight,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppTheme.textPrimary,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            // Search bar
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                    checkmarkColor: Colors.white,
-                  ),
-                );
-              },
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Products count
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Text(
-                  '${products.length} product${products.length != 1 ? 's' : ''} available',
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  ],
                 ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: _loadProducts,
-                  color: AppTheme.primaryColor,
-                ),
-              ],
-            ),
-          ),
-
-          // Products Grid
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : products.isEmpty
-                    ? _buildEmptyState()
-                    : RefreshIndicator(
-                        onRefresh: _loadProducts,
-                        child: GridView.builder(
-                          padding: const EdgeInsets.all(16),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.68,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    _marketplaceService.searchProducts(value);
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Search handcrafted items...',
+                    hintStyle: const TextStyle(color: AppTheme.textLight, fontSize: 14),
+                    prefixIcon: const Icon(Icons.search, color: AppTheme.textLight, size: 22),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: AppTheme.textLight, size: 20),
+                            onPressed: () {
+                              _searchController.clear();
+                              _marketplaceService.searchProducts('');
+                              setState(() {});
+                            },
+                          )
+                        : const Padding(
+                            padding: EdgeInsets.only(right: 12),
+                            child: Icon(Icons.camera_alt_outlined, color: AppTheme.textLight, size: 22),
                           ),
-                          itemCount: products.length,
-                          itemBuilder: (context, index) {
-                            return _buildProductCard(products[index]);
-                          },
-                        ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Category circles
+            SizedBox(
+              height: 86,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  return _buildCategoryItem(category, category == selectedCategory);
+                },
+              ),
+            ),
+
+            const SizedBox(height: 4),
+
+            // "All Items" header + product count badge
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 16, 8),
+              child: Row(
+                children: [
+                  Text(
+                    selectedCategory == 'All' ? 'All Items' : selectedCategory,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${products.length}',
+                      style: const TextStyle(
+                        color: AppTheme.primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                       ),
-          ),
-        ],
+                    ),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.tune, color: AppTheme.textSecondary, size: 22),
+                ],
+              ),
+            ),
+
+            // Product grid
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : products.isEmpty
+                      ? _buildEmptyState()
+                      : RefreshIndicator(
+                          onRefresh: _loadProducts,
+                          child: GridView.builder(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.68,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                            ),
+                            itemCount: products.length,
+                            itemBuilder: (context, index) {
+                              return _buildProductCard(products[index]);
+                            },
+                          ),
+                        ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildCategoryItem(String category, bool isSelected) {
+    return GestureDetector(
+      onTap: () => _marketplaceService.filterByCategory(category),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: SizedBox(
+          width: 62,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSelected ? AppTheme.primaryColor : Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: isSelected
+                          ? AppTheme.primaryColor.withValues(alpha: 0.35)
+                          : Colors.black.withValues(alpha: 0.07),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  _getCategoryIcon(category),
+                  color: isSelected ? Colors.white : AppTheme.textSecondary,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                category,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                  color: isSelected ? AppTheme.primaryColor : AppTheme.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'All':       return Icons.apps_rounded;
+      case 'Woodwork':  return Icons.forest;
+      case 'Textiles':  return Icons.checkroom;
+      case 'Pottery':   return Icons.local_cafe_outlined;
+      case 'Jewelry':   return Icons.diamond_outlined;
+      case 'Paintings': return Icons.palette_outlined;
+      case 'Metalwork': return Icons.hardware;
+      case 'Bamboo':    return Icons.grass;
+      case 'Leather':   return Icons.wallet_outlined;
+      default:          return Icons.category_outlined;
+    }
   }
 
   Widget _buildProductCard(Product product) {
