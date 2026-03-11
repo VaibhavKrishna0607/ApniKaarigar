@@ -26,9 +26,12 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _instructionsController = TextEditingController();
+  final _couponController = TextEditingController();
 
   int _quantity = 1;
   bool _isPlacingOrder = false;
+  bool _couponApplied = false;
+  String _couponError = '';
 
   double get _totalPrice => widget.product.price * _quantity;
 
@@ -40,10 +43,66 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
       ),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 12,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            onPressed: _isPlacingOrder ? null : _placeOrder,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              backgroundColor: AppTheme.primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: _isPlacingOrder
+                ? const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        'Placing Order...',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  )
+                : Text(
+                    'Place Order · ₹${_totalPrice.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+          ),
+        ),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           children: [
             // Product Summary
             Container(
@@ -301,6 +360,89 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
+
+            // Coupon Code
+            const Text(
+              'Coupon Code',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _couponController,
+                    textCapitalization: TextCapitalization.characters,
+                    decoration: InputDecoration(
+                      hintText: 'Enter coupon code',
+                      prefixIcon: const Icon(Icons.local_offer_outlined),
+                      errorText: _couponError.isNotEmpty ? _couponError : null,
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _couponApplied
+                        ? () => setState(() {
+                              _couponApplied = false;
+                              _couponController.clear();
+                              _couponError = '';
+                            })
+                        : _applyCoupon,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _couponApplied
+                          ? AppTheme.successColor
+                          : AppTheme.primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      _couponApplied ? 'Remove' : 'Apply',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (_couponApplied)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: AppTheme.successColor, size: 16),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Coupon "${_couponController.text}" applied!',
+                      style: const TextStyle(
+                        color: AppTheme.successColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             const SizedBox(height: 24),
 
             // Payment Note
@@ -326,47 +468,6 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 32),
-
-            // Place Order Button
-            ElevatedButton(
-              onPressed: _isPlacingOrder ? null : _placeOrder,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: AppTheme.primaryColor,
-              ),
-              child: _isPlacingOrder
-                  ? const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          'Placing Order...',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Text(
-                      'Place Order - ₹${_totalPrice.toStringAsFixed(0)}',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
             ),
             const SizedBox(height: 16),
           ],
@@ -450,12 +551,26 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
     }
   }
 
+  void _applyCoupon() {
+    final code = _couponController.text.trim().toUpperCase();
+    if (code.isEmpty) {
+      setState(() => _couponError = 'Please enter a coupon code');
+      return;
+    }
+    // No coupon backend yet — show invalid message
+    setState(() {
+      _couponError = 'Invalid or expired coupon code';
+      _couponApplied = false;
+    });
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
     _instructionsController.dispose();
+    _couponController.dispose();
     super.dispose();
   }
 }
