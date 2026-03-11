@@ -40,8 +40,6 @@ class _OrderPlacementScreenState extends State<OrderPlacementScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Place Order'),
-        backgroundColor: AppTheme.primaryColor,
-        foregroundColor: Colors.white,
       ),
       bottomNavigationBar: SafeArea(
         child: Container(

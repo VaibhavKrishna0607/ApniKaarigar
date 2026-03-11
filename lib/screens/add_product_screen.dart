@@ -509,15 +509,27 @@ class _AddProductScreenState extends State<AddProductScreen> {
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Choose from Gallery'),
+              subtitle: const Text('Select multiple images'),
               onTap: () async {
                 Navigator.pop(context);
-                final image = await _storageService.pickImageFromGallery();
-                if (image != null) {
-                  final bytes = await image.readAsBytes();
-                  setState(() {
-                    _selectedImages.add(image);
-                    _imageCache[image.path] = bytes;
-                  });
+                final images = await _storageService.pickMultipleImages();
+                if (images.isNotEmpty) {
+                  final remaining = 5 - _selectedImages.length;
+                  final toAdd = images.take(remaining).toList();
+                  for (final image in toAdd) {
+                    final bytes = await image.readAsBytes();
+                    if (mounted) {
+                      setState(() {
+                        _selectedImages.add(image);
+                        _imageCache[image.path] = bytes;
+                      });
+                    }
+                  }
+                  if (images.length > remaining && mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Only $remaining more image(s) allowed, others skipped')),
+                    );
+                  }
                 }
               },
             ),

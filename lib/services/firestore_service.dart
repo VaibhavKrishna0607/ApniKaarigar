@@ -309,6 +309,12 @@ class FirestoreService {
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
+    // Decrement stock atomically
+    await _productsCollection.doc(productId).update({
+      'stockQuantity': FieldValue.increment(-quantity),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
     return docRef.id;
   }
 

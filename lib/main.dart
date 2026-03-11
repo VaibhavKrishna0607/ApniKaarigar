@@ -9,6 +9,7 @@ import 'screens/products_screen.dart';
 import 'screens/orders_screen.dart';
 import 'screens/ai_assistant_screen.dart';
 import 'screens/profile_screen.dart';
+import 'services/user_data_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,11 +25,12 @@ void main() async {
     // Continue anyway - app can still load UI
   }
 
-  // Set status bar style
+  // Set status bar style (dark icons for light theme)
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
     ),
   );
 
@@ -58,6 +60,7 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
+  final UserDataProvider _dataProvider = UserDataProvider();
 
   void _onNavigate(int index) {
     setState(() {
@@ -103,63 +106,71 @@ class _MainNavigationState extends State<MainNavigation> {
               label: 'My Products',
             ),
             BottomNavigationBarItem(
-              icon: Stack(
-                children: [
-                  const Icon(Icons.shopping_bag_outlined),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: const BoxDecoration(
-                        color: AppTheme.errorColor,
-                        shape: BoxShape.circle,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 14,
-                        minHeight: 14,
-                      ),
-                      child: const Text(
-                        '1',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
+              icon: ListenableBuilder(
+                listenable: _dataProvider,
+                builder: (context, _) {
+                  final count = _dataProvider.pendingOrdersCount;
+                  return Stack(
+                    children: [
+                      const Icon(Icons.shopping_bag_outlined),
+                      if (count > 0)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: AppTheme.errorColor,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                            child: Text(
+                              count > 9 ? '9+' : '$count',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               ),
-              activeIcon: Stack(
-                children: [
-                  const Icon(Icons.shopping_bag),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: const BoxDecoration(
-                        color: AppTheme.errorColor,
-                        shape: BoxShape.circle,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 14,
-                        minHeight: 14,
-                      ),
-                      child: const Text(
-                        '1',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
+              activeIcon: ListenableBuilder(
+                listenable: _dataProvider,
+                builder: (context, _) {
+                  final count = _dataProvider.pendingOrdersCount;
+                  return Stack(
+                    children: [
+                      const Icon(Icons.shopping_bag),
+                      if (count > 0)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: AppTheme.errorColor,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                            child: Text(
+                              count > 9 ? '9+' : '$count',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               ),
               label: 'Orders',
             ),

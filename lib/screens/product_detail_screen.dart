@@ -26,7 +26,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            backgroundColor: AppTheme.primaryColor,
+            backgroundColor: AppTheme.surfaceColor,
+            foregroundColor: AppTheme.blackColor,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,

@@ -440,20 +440,6 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
       labelText: label,
       prefixIcon: Icon(icon, color: AppTheme.primaryColor),
       suffixIcon: suffixIcon,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
-      ),
-      filled: true,
-      fillColor: Colors.grey[50],
     );
   }
 

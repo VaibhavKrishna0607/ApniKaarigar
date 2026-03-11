@@ -52,8 +52,13 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Marketplace'),
-        backgroundColor: AppTheme.primaryColor,
-        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_outlined),
+            onPressed: _loadProducts,
+            tooltip: 'Refresh',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -398,6 +403,8 @@ class _MarketplaceProductDetailScreenState extends State<MarketplaceProductDetai
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
+            backgroundColor: AppTheme.surfaceColor,
+            foregroundColor: AppTheme.blackColor,
             flexibleSpace: FlexibleSpaceBar(
               background: widget.product.images.isNotEmpty
                   ? Image.network(

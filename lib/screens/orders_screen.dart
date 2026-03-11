@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/order.dart';
 import '../services/user_data_provider.dart';
 import '../theme/app_theme.dart';
@@ -374,32 +375,58 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
   }
 
   void _updateOrderStatus(Order order) {
-    // In a real app, this would update the backend
+    final nextStatus = _getNextStatus(order.status);
+    if (nextStatus == null) return;
+
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Update Order Status'),
-        content: Text('Mark order #${order.id.substring(6)} as ${_getNextActionText(order.status)}?'),
+        content: Text(
+          'Mark order #${order.id.length > 6 ? order.id.substring(order.id.length - 6) : order.id} as "${_getNextActionText(order.status)}"?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            style: ElevatedButton.styleFrom(minimumSize: const Size(80, 40)),
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Order updated to ${_getNextActionText(order.status)}'),
-                  backgroundColor: AppTheme.successColor,
-                ),
-              );
+              final success = await _dataProvider.updateOrderStatus(order.id, nextStatus);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Order updated to "${_getNextActionText(order.status)}"'
+                          : 'Failed to update order status',
+                    ),
+                    backgroundColor: success ? AppTheme.successColor : AppTheme.errorColor,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                );
+                if (success) setState(() {});
+              }
             },
             child: const Text('Confirm'),
           ),
         ],
       ),
     );
+  }
+
+  OrderStatus? _getNextStatus(OrderStatus current) {
+    switch (current) {
+      case OrderStatus.pending:    return OrderStatus.confirmed;
+      case OrderStatus.confirmed:  return OrderStatus.processing;
+      case OrderStatus.processing: return OrderStatus.shipped;
+      case OrderStatus.shipped:    return OrderStatus.delivered;
+      default: return null;
+    }
   }
 
   void _showContactOptions(Order order) {
@@ -409,60 +436,69 @@ class _OrdersScreenState extends State<OrdersScreen> with SingleTickerProviderSt
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Contact Buyer',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Contact ${order.buyerName}',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ),
-              const SizedBox(height: 20),
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppTheme.successColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                const SizedBox(height: 4),
+                Text(order.buyerPhone, style: const TextStyle(color: AppTheme.textSecondary)),
+                const SizedBox(height: 20),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.successColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.phone, color: AppTheme.successColor),
                   ),
-                  child: const Icon(Icons.phone, color: AppTheme.successColor),
+                  title: const Text('Call'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    launchUrl(Uri.parse('tel:${order.buyerPhone}'));
+                  },
                 ),
-                title: const Text('Call'),
-                subtitle: Text(order.buyerPhone),
-                onTap: () => Navigator.pop(context),
-              ),
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF25D366).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.chat, color: Color(0xFF25D366)),
                   ),
-                  child: const Icon(Icons.chat, color: Colors.green),
+                  title: const Text('WhatsApp'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    final phone = order.buyerPhone.replaceAll(RegExp(r'\D'), '');
+                    launchUrl(Uri.parse('https://wa.me/91$phone'));
+                  },
                 ),
-                title: const Text('WhatsApp'),
-                subtitle: Text(order.buyerPhone),
-                onTap: () => Navigator.pop(context),
-              ),
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppTheme.infoColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.infoColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.sms, color: AppTheme.infoColor),
                   ),
-                  child: const Icon(Icons.message, color: AppTheme.infoColor),
+                  title: const Text('SMS'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    launchUrl(Uri.parse('sms:${order.buyerPhone}'));
+                  },
                 ),
-                title: const Text('SMS'),
-                subtitle: Text(order.buyerPhone),
-                onTap: () => Navigator.pop(context),
-              ),
-              const SizedBox(height: 8),
-            ],
+                const SizedBox(height: 8),
+              ],
+            ),
           ),
         );
       },
